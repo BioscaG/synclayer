@@ -62,9 +62,12 @@ def fetch_slack_messages(
             "No Slack bot token available — connect Slack from Settings or set "
             "SLACK_BOT_TOKEN"
         )
+    import ssl
+    import certifi
     from slack_sdk import WebClient
 
-    client = WebClient(token=auth_token)
+    ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+    client = WebClient(token=auth_token, ssl=ssl_ctx)
     result = client.conversations_history(channel=channel_id, limit=limit)
     raw_messages = result.get("messages", []) or []
 
