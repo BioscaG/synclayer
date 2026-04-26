@@ -23,7 +23,7 @@ from backend.extractors.slack_extractor import process_slack
 from backend.extractors.tickets import process_tickets
 from backend.models.schemas import Entity, IngestEvent, SourceType
 from backend.semantic.embeddings import embed_entities
-from backend.storage import Store, get_store
+from backend.storage import Store
 
 import uuid
 
@@ -90,7 +90,7 @@ def sync_repo(
     team: str,
     target: str,
     *,
-    store: Optional[Store] = None,
+    store: Store,
     repo_root: Optional[Path] = None,
     baseline_prs: int = 30,
     baseline_commits: int = 50,
@@ -108,7 +108,6 @@ def sync_repo(
     SHA hasn't been seen before, so re-syncing a steady repo costs almost
     nothing.
     """
-    store = store or get_store()
     target = normalize_github_target(target)
 
     # Decide whether this is a path or a github reference.
@@ -165,12 +164,17 @@ def sync_repo(
     store.set_source_state("repo", team, source_id, state)
 
     mode = "baseline" if is_baseline else "incremental"
-    desc = (
-        f"{mode} sync of {repo_name}"
-        if entities
-        else f"{mode} sync of {repo_name} (no new items)"
-    )
-    _record_event(store, SourceType.GITHUB, team, desc, len(entities))
+    # Skip event recording for routine incremental polls that produced
+    # nothing new — they'd otherwise flood the activity feed every minute
+    # with "no new items" rows that look like the timer keeps resetting.
+    # First-time baselines always log so the user sees the source land.
+    if entities or is_baseline:
+        desc = (
+            f"{mode} sync of {repo_name}"
+            if entities
+            else f"{mode} sync of {repo_name} (no new items)"
+        )
+        _record_event(store, SourceType.GITHUB, team, desc, len(entities))
     store.save()
 
     log.info(
@@ -200,7 +204,7 @@ def sync_slack_channel(
     team: str,
     target: str,
     *,
-    store: Optional[Store] = None,
+    store: Store,
     repo_root: Optional[Path] = None,
 ) -> dict:
     """Best-effort incremental Slack sync.
@@ -208,8 +212,6 @@ def sync_slack_channel(
     For now the underlying extractor always fetches the latest N messages.
     We dedupe by message timestamp, so re-running adds only fresh messages.
     """
-    store = store or get_store()
-
     candidate = Path(target)
     if not candidate.is_absolute() and repo_root:
         candidate = repo_root / target
@@ -222,9 +224,17 @@ def sync_slack_channel(
 
     source_id = channel_id or json_path or target
     state = store.source_state("slack", team, source_id)
+    is_baseline = not state.get("initialized")
     seen_ts = set(state.get("seen_message_ts", []))
 
-    entities = process_slack(channel_id=channel_id, json_path=json_path, team=team)
+    # Pass the workspace's per-tenant Slack token if it has one. Falls back
+    # to the global SLACK_BOT_TOKEN env var inside the extractor when None.
+    slack_cfg = store._meta.get("slack") or {}  # noqa: SLF001
+    token = slack_cfg.get("bot_token")
+
+    entities = process_slack(
+        channel_id=channel_id, json_path=json_path, team=team, token=token
+    )
 
     # No raw-message-level filtering yet; the extractor groups them. We just
     # treat each ingest as additive. The pair_cache dedupes downstream cost,
@@ -238,16 +248,17 @@ def sync_slack_channel(
     state["last_error"] = None
     store.set_source_state("slack", team, source_id, state)
 
-    _record_event(
-        store,
-        SourceType.SLACK,
-        team,
-        f"slack sync of {source_id}",
-        len(entities),
-    )
+    if entities or is_baseline:
+        _record_event(
+            store,
+            SourceType.SLACK,
+            team,
+            f"slack sync of {source_id}",
+            len(entities),
+        )
     store.save()
     return {
-        "mode": "incremental" if state.get("initialized") else "baseline",
+        "mode": "baseline" if is_baseline else "incremental",
         "extracted_entities": len(entities),
         "new_entities": new_count,
     }
@@ -260,11 +271,10 @@ def sync_ticket_file(
     team: str,
     path: str,
     *,
-    store: Optional[Store] = None,
+    store: Store,
     repo_root: Optional[Path] = None,
 ) -> dict:
     """Sync a tickets JSON file into memory."""
-    store = store or get_store()
     candidate = Path(path)
     if not candidate.is_absolute() and repo_root:
         candidate = repo_root / path
@@ -272,6 +282,7 @@ def sync_ticket_file(
         raise FileNotFoundError(f"Ticket file not found: {candidate}")
 
     state = store.source_state("ticket", team, str(candidate))
+    is_baseline = not state.get("initialized")
     entities = process_tickets(str(candidate), team)
     new_count = _embed_and_add(store, entities)
 
@@ -281,13 +292,14 @@ def sync_ticket_file(
     state["last_error"] = None
     store.set_source_state("ticket", team, str(candidate), state)
 
-    _record_event(
-        store,
-        SourceType.TICKET,
-        team,
-        f"ticket sync of {candidate.name}",
-        len(entities),
-    )
+    if entities or is_baseline:
+        _record_event(
+            store,
+            SourceType.TICKET,
+            team,
+            f"ticket sync of {candidate.name}",
+            len(entities),
+        )
     store.save()
     return {
         "extracted_entities": len(entities),

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import type { Conflict } from "@/lib/types";
 import { ConflictCard } from "@/components/conflict-card";
 
@@ -16,6 +19,8 @@ export function NewConflictsBanner({
   result: NewConflictsResult;
   onDismiss: () => void;
 }) {
+  const params = useParams<{ wsId: string }>();
+  const wsId = params?.wsId || "";
   const dupes = result.new_conflicts.filter(
     (c) => c.conflict_type === "duplication"
   );
@@ -48,7 +53,7 @@ export function NewConflictsBanner({
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
-          <Link href="/conflicts" className="btn btn-primary">
+          <Link href={`/w/${wsId}/conflicts`} className="btn btn-primary">
             View all conflicts
           </Link>
           <button onClick={onDismiss} className="btn">

@@ -47,13 +47,24 @@ Return ONLY valid JSON array."""
 # ---------------------------------------------------------------------------
 # Fetching
 # ---------------------------------------------------------------------------
-def fetch_slack_messages(channel_id: str, limit: int = 100) -> list[dict]:
-    """Fetch the latest messages from a Slack channel using slack-sdk."""
-    if not SLACK_BOT_TOKEN:
-        raise RuntimeError("SLACK_BOT_TOKEN is not set")
+def fetch_slack_messages(
+    channel_id: str, limit: int = 100, *, token: Optional[str] = None
+) -> list[dict]:
+    """Fetch the latest messages from a Slack channel using slack-sdk.
+
+    ``token`` overrides the global ``SLACK_BOT_TOKEN`` env var — used by the
+    workspace-level OAuth flow so each SyncLayer workspace can talk to its
+    own Slack workspace.
+    """
+    auth_token = token or SLACK_BOT_TOKEN
+    if not auth_token:
+        raise RuntimeError(
+            "No Slack bot token available — connect Slack from Settings or set "
+            "SLACK_BOT_TOKEN"
+        )
     from slack_sdk import WebClient
 
-    client = WebClient(token=SLACK_BOT_TOKEN)
+    client = WebClient(token=auth_token)
     result = client.conversations_history(channel=channel_id, limit=limit)
     raw_messages = result.get("messages", []) or []
 
@@ -179,6 +190,7 @@ def process_slack(
     channel_id: Optional[str] = None,
     json_path: Optional[str] = None,
     team: str,
+    token: Optional[str] = None,
 ) -> list[Entity]:
     """Main entry point — choose live API or pre-fetched JSON."""
     if not channel_id and not json_path:
@@ -187,7 +199,7 @@ def process_slack(
     if json_path:
         messages, channel_name = fetch_slack_messages_from_json(json_path)
     else:
-        messages = fetch_slack_messages(channel_id)  # type: ignore[arg-type]
+        messages = fetch_slack_messages(channel_id, token=token)  # type: ignore[arg-type]
         channel_name = channel_id  # type: ignore[assignment]
 
     return extract_entities_from_slack(messages, team, channel_name)

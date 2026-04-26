@@ -104,23 +104,36 @@ class BackgroundPoller:
                 continue
 
     async def _tick_once(self) -> None:
-        store = get_store()
-        cfg = store.company_config()
-        teams = cfg.get("teams", {}) or {}
+        from functools import partial
+        from backend.workspaces import get_registry
 
+        registry = get_registry()
         started = datetime.utcnow()
         new_total = 0
         errors: list[str] = []
         loop = asyncio.get_running_loop()
 
-        for team_name, t_cfg in teams.items():
-            for repo in t_cfg.get("repos") or []:
-                try:
-                    r = await loop.run_in_executor(None, sync_repo, team_name, repo)
-                    new_total += int(r.get("new_entities", 0))
-                except Exception as exc:  # noqa: BLE001
-                    errors.append(f"{team_name}/{repo}: {exc}")
-                    log.warning("Poller repo sync failed for %s/%s: %s", team_name, repo, exc)
+        for ws in registry.list():
+            try:
+                store = get_store(ws.id)
+            except KeyError:
+                continue
+            cfg = store.company_config()
+            teams = cfg.get("teams", {}) or {}
+            for team_name, t_cfg in teams.items():
+                for repo in t_cfg.get("repos") or []:
+                    try:
+                        r = await loop.run_in_executor(
+                            None,
+                            partial(sync_repo, team_name, repo, store=store),
+                        )
+                        new_total += int(r.get("new_entities", 0))
+                    except Exception as exc:  # noqa: BLE001
+                        errors.append(f"{ws.id}/{team_name}/{repo}: {exc}")
+                        log.warning(
+                            "Poller repo sync failed for %s/%s/%s: %s",
+                            ws.id, team_name, repo, exc,
+                        )
 
         self.last_poll_at = started
         self.last_poll_duration_ms = int(
@@ -132,8 +145,8 @@ class BackgroundPoller:
 
         if new_total > 0:
             log.info(
-                "Poller tick #%d: +%d new entities across %d team(s)",
-                self.ticks, new_total, len(teams),
+                "Poller tick #%d: +%d new entities across %d workspace(s)",
+                self.ticks, new_total, len(registry.list()),
             )
 
 

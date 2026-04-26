@@ -47,17 +47,19 @@ def _classify_type(relationship: str, a: Entity, b: Entity) -> ConflictType | No
 def _severity(
     conflict_type: ConflictType, confidence: float, similarity: float
 ) -> Severity:
+    """Map a (type, confidence, similarity) tuple to a severity tier.
+
+    No INFO tier — every surfaced conflict is at least WARNING. Weak signals
+    are filtered out earlier in ``classify_conflicts`` so we don't dilute the
+    dashboard with low-quality matches.
+    """
     if conflict_type == ConflictType.CONTRADICTION:
         return Severity.CRITICAL
     if conflict_type == ConflictType.SAY_VS_DO and confidence > 0.7:
         return Severity.CRITICAL
     if conflict_type == ConflictType.DUPLICATION and confidence > 0.7:
         return Severity.CRITICAL
-    if conflict_type == ConflictType.HIDDEN_DEPENDENCY:
-        return Severity.WARNING
-    if confidence > 0.6 or similarity > 0.7:
-        return Severity.WARNING
-    return Severity.INFO
+    return Severity.WARNING
 
 
 def _recommendation(conflict_type: ConflictType, a: Entity, b: Entity) -> str:
@@ -109,8 +111,9 @@ def classify_conflicts(normalized: Iterable[dict]) -> list[Conflict]:
         conflict_type = _classify_type(relationship, a, b)
         if conflict_type is None:
             continue
-        if confidence < 0.4 and similarity < 0.55:
-            # Low-quality signal — drop instead of polluting the dashboard.
+        # Essentials-only filter: require both decent confidence and decent
+        # semantic similarity. Either alone produces too much noise.
+        if confidence < 0.55 or similarity < 0.55:
             continue
 
         severity = _severity(conflict_type, confidence, similarity)

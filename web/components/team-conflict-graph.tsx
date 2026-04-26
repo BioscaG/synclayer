@@ -18,27 +18,26 @@ const TYPE_LABEL: Record<ConflictType, string> = {
   say_vs_do: "Say vs do",
 };
 
-// Severity-driven thickness — critical conflicts read as the heaviest line.
 const SEVERITY_WEIGHT: Record<string, number> = {
   critical: 3,
   warning: 2,
   info: 1,
 };
 
-interface Edge {
-  a: string;
-  b: string;
-  count: number;
-  byType: Map<ConflictType, number>;
-  severityWeight: number;
-  dominantType: ConflictType;
-  conflicts: Conflict[];
-}
-
 interface NodeRow {
   team: string;
   conflicts: number;
   color: string;
+}
+
+/** One drawable edge — uniquely identified by (pair, conflict_type). */
+interface TypedEdge {
+  pairKey: string;     // "a::b" sorted
+  a: string;
+  b: string;
+  type: ConflictType;
+  count: number;       // how many conflicts of this type in this pair
+  severityWeight: number;
 }
 
 export function TeamConflictGraph({
@@ -47,17 +46,15 @@ export function TeamConflictGraph({
   onSelectPair,
 }: {
   conflicts: Conflict[];
-  /** Optional team→color map. Falls back to deterministic palette. */
   teamColors?: Record<string, string>;
-  /** Called when an edge is clicked. */
   onSelectPair?: (a: string, b: string) => void;
 }) {
   const [hoveredTeam, setHoveredTeam] = useState<string | null>(null);
   const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
 
-  const { nodes, edges } = useMemo(() => {
+  const { nodes, edges, edgesByPair } = useMemo(() => {
     const nodeMap = new Map<string, NodeRow>();
-    const edgeMap = new Map<string, Edge>();
+    const typedMap = new Map<string, TypedEdge>();
 
     for (const c of conflicts) {
       const ta = c.entity_a.team;
@@ -76,45 +73,51 @@ export function TeamConflictGraph({
       }
 
       const [x, y] = [ta, tb].sort();
-      const key = `${x}::${y}`;
-      let edge = edgeMap.get(key);
+      const pairKey = `${x}::${y}`;
+      const key = `${pairKey}::${c.conflict_type}`;
+      let edge = typedMap.get(key);
       if (!edge) {
         edge = {
+          pairKey,
           a: x,
           b: y,
+          type: c.conflict_type,
           count: 0,
-          byType: new Map(),
           severityWeight: 0,
-          dominantType: c.conflict_type,
-          conflicts: [],
         };
-        edgeMap.set(key, edge);
+        typedMap.set(key, edge);
       }
       edge.count += 1;
-      edge.byType.set(
-        c.conflict_type,
-        (edge.byType.get(c.conflict_type) || 0) + 1
-      );
       edge.severityWeight += SEVERITY_WEIGHT[c.severity] || 1;
-      edge.conflicts.push(c);
     }
 
-    // Resolve dominant type per edge (most common conflict type on that pair).
-    for (const edge of edgeMap.values()) {
-      let max = 0;
-      for (const [t, n] of edge.byType) {
-        if (n > max) {
-          max = n;
-          edge.dominantType = t;
-        }
-      }
+    // Group typed edges by pair so we can offset them perpendicularly
+    // (multiple conflicts between the same two teams stack as parallel lines).
+    const byPair = new Map<string, TypedEdge[]>();
+    for (const edge of typedMap.values()) {
+      const list = byPair.get(edge.pairKey) || [];
+      list.push(edge);
+      byPair.set(edge.pairKey, list);
+    }
+    // Stable color order so the visual doesn't jitter when re-rendering.
+    const TYPE_ORDER: ConflictType[] = [
+      "duplication",
+      "contradiction",
+      "dependency",
+      "say_vs_do",
+    ];
+    for (const list of byPair.values()) {
+      list.sort(
+        (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type)
+      );
     }
 
     return {
       nodes: Array.from(nodeMap.values()).sort(
         (a, b) => b.conflicts - a.conflicts
       ),
-      edges: Array.from(edgeMap.values()),
+      edges: Array.from(typedMap.values()),
+      edgesByPair: byPair,
     };
   }, [conflicts, teamColors]);
 
@@ -130,7 +133,6 @@ export function TeamConflictGraph({
     );
   }
 
-  // Geometry
   const W = 560;
   const H = 480;
   const cx = W / 2;
@@ -146,12 +148,14 @@ export function TeamConflictGraph({
       angle,
     };
   });
-
   const posByTeam = new Map(positions.map((p) => [p.team, p]));
 
   const maxConflicts = Math.max(1, ...nodes.map((n) => n.conflicts));
   const radius = (n: NodeRow) =>
     8 + 14 * Math.sqrt(n.conflicts / maxConflicts);
+
+  // Offset spacing between parallel edges in the same pair (px, in viewBox units).
+  const PARALLEL_SPACING = 7;
 
   return (
     <div className="relative">
@@ -161,34 +165,52 @@ export function TeamConflictGraph({
         role="img"
         aria-label="Cross-team conflict graph"
       >
-        {/* edges first, so nodes render on top */}
         {edges.map((e) => {
           const a = posByTeam.get(e.a)!;
           const b = posByTeam.get(e.b)!;
-          const id = `${e.a}::${e.b}`;
+          // Perpendicular unit vector to the chord — used to offset parallel
+          // edges between the same pair so they don't overlap.
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const perpX = -dy / len;
+          const perpY = dx / len;
+
+          const pairList = edgesByPair.get(e.pairKey) || [];
+          const idxInPair = pairList.indexOf(e);
+          const total = pairList.length;
+          const offsetSteps = idxInPair - (total - 1) / 2;
+          const offset = offsetSteps * PARALLEL_SPACING;
+
+          // Slight outward bow so the line reads as a curve, not a chord
+          // through dense node areas. Bow direction matches the offset side
+          // so parallel edges fan out cleanly.
+          const bow = total > 1 ? Math.sign(offsetSteps || 1) * 6 : 0;
+          const totalOffset = offset + bow;
+
+          const mx = (a.x + b.x) / 2 + perpX * totalOffset;
+          const my = (a.y + b.y) / 2 + perpY * totalOffset;
+
+          const id = `${e.pairKey}::${e.type}`;
           const involves =
             !hoveredTeam || e.a === hoveredTeam || e.b === hoveredTeam;
-          const dim = (hoveredTeam && !involves) || (hoveredEdge && hoveredEdge !== id);
-          const stroke = TYPE_COLORS[e.dominantType] || "#4A4A4A";
-          const width = Math.min(7, 1.5 + e.severityWeight * 0.6);
-          // Curve toward the center for a less spaghetti look
-          const mx = (a.x + b.x) / 2;
-          const my = (a.y + b.y) / 2;
-          const tx = (cx - mx) * 0.2;
-          const ty = (cy - my) * 0.2;
-          const px = mx + tx;
-          const py = my + ty;
+          const dim =
+            (hoveredTeam && !involves) || (hoveredEdge && hoveredEdge !== id);
+
+          const stroke = TYPE_COLORS[e.type] || "#71717A";
+          const width = Math.min(5, 1.25 + e.severityWeight * 0.5);
+
           return (
             <path
               key={id}
-              d={`M ${a.x} ${a.y} Q ${px} ${py} ${b.x} ${b.y}`}
+              d={`M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`}
               fill="none"
               stroke={stroke}
               strokeWidth={width}
-              strokeOpacity={dim ? 0.12 : 0.55}
+              strokeOpacity={dim ? 0.12 : 0.7}
               strokeLinecap="round"
               className={cn(
-                "transition-opacity duration-200",
+                "transition-opacity duration-150",
                 onSelectPair && "cursor-pointer"
               )}
               onMouseEnter={() => setHoveredEdge(id)}
@@ -196,9 +218,9 @@ export function TeamConflictGraph({
               onClick={() => onSelectPair?.(e.a, e.b)}
             >
               <title>
-                {`${e.a} ↔ ${e.b}: ${e.count} conflict${
+                {`${e.a} ↔ ${e.b}: ${e.count} ${TYPE_LABEL[e.type]}${
                   e.count === 1 ? "" : "s"
-                } (dominant: ${TYPE_LABEL[e.dominantType]})`}
+                }`}
               </title>
             </path>
           );
@@ -208,10 +230,8 @@ export function TeamConflictGraph({
         {positions.map((p) => {
           const r = radius(p);
           const dim = hoveredTeam && p.team !== hoveredTeam;
-          // Push label outward along the angle so it doesn't sit on the node.
           const lx = p.x + Math.cos(p.angle) * (r + 14);
           const ly = p.y + Math.sin(p.angle) * (r + 14);
-          // Anchor based on which side of the circle we're on
           const anchor =
             Math.abs(Math.cos(p.angle)) < 0.3
               ? "middle"
@@ -255,8 +275,9 @@ export function TeamConflictGraph({
                 y={ly}
                 textAnchor={anchor}
                 dominantBaseline={baseline}
-                className="font-serif fill-ink"
-                fontSize={14}
+                className="font-sans fill-ink"
+                fontSize={13}
+                fontWeight={500}
               >
                 {p.team}
               </text>
@@ -294,7 +315,7 @@ export function TeamConflictGraph({
           )
         )}
         <span className="ml-auto text-eyebrow">
-          Node size = conflicts involving the team · Edge weight = severity sum
+          Node size = conflicts involving the team · Line weight = severity
         </span>
       </div>
     </div>

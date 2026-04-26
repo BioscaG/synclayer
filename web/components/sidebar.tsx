@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -9,19 +9,23 @@ import {
   CalendarClock,
   Settings,
   Activity,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "Overview", icon: LayoutDashboard },
-  { href: "/teams", label: "Teams", icon: Users },
-  { href: "/meetings", label: "Meetings", icon: CalendarClock },
-  { href: "/conflicts", label: "Conflicts", icon: AlertTriangle },
-  { href: "/setup", label: "Settings", icon: Settings },
+  { slug: "", label: "Overview", icon: LayoutDashboard },
+  { slug: "teams", label: "Teams", icon: Users },
+  { slug: "meetings", label: "Meetings", icon: CalendarClock },
+  { slug: "conflicts", label: "Conflicts", icon: AlertTriangle },
+  { slug: "setup", label: "Settings", icon: Settings },
 ] as const;
 
 export function Sidebar() {
+  const params = useParams<{ wsId: string }>();
+  const wsId = params?.wsId || "";
   const pathname = usePathname();
+  const base = `/w/${wsId}`;
 
   return (
     <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-60 border-r border-rule bg-paper z-30 flex-col">
@@ -35,15 +39,25 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-        <div className="px-3 mb-2 text-eyebrow font-medium text-muted uppercase tracking-wider">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2 rounded text-meta text-muted hover:text-ink hover:bg-surface transition-colors"
+        >
+          <ArrowLeft size={14} strokeWidth={1.75} />
+          <span>All workspaces</span>
+        </Link>
+        <div className="px-3 pt-4 pb-2 text-eyebrow font-medium text-muted uppercase tracking-wider">
           Workspace
         </div>
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {NAV.map(({ slug, label, icon: Icon }) => {
+          const href = slug ? `${base}/${slug}` : base;
           const active =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
+            slug === ""
+              ? pathname === base || pathname === `${base}/`
+              : pathname.startsWith(`${base}/${slug}`);
           return (
             <Link
-              key={href}
+              key={slug || "overview"}
               href={href}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded text-meta transition-colors",
@@ -64,7 +78,7 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-rule p-4 text-eyebrow font-mono text-muted tracking-wide">
-        SyncLayer · v0.3
+        SyncLayer · v0.4
       </div>
     </aside>
   );

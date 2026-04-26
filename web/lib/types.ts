@@ -101,6 +101,20 @@ export interface TeamDetail {
   source_states: Record<string, SourceState>;
 }
 
+export interface Workspace {
+  id: string;
+  name: string;
+  color: string;
+  created_at: string;
+}
+
+export interface WorkspaceSummary extends Workspace {
+  entities: number;
+  teams: number;
+  conflicts: number;
+  critical_conflicts: number;
+}
+
 export interface OverviewStats {
   entities: number;
   by_source: Record<string, number>;
@@ -161,6 +175,55 @@ export interface MeetingSummary {
   team: string;
   ingested_at: string;
   entity_count: number;
+}
+
+export type BotStatus =
+  | "joining"
+  | "in_call"
+  | "processing"
+  | "done"
+  | "failed";
+
+export interface MeetingBot {
+  bot_id: string;
+  ws_id: string;
+  team: string;
+  meeting_url: string;
+  title: string;
+  bot_name: string;
+  status: BotStatus;
+  recall_status: string;
+  error: string | null;
+  transcript_chars: number;
+  entities_extracted: number;
+  new_conflicts: number;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface SlackStatus {
+  connected: boolean;
+  configured: boolean;
+  team_id?: string | null;
+  team_name?: string | null;
+  connected_at?: string | null;
+}
+
+export interface SlackChannel {
+  id: string;
+  name: string;
+  is_private: boolean;
+  is_member: boolean;
+  num_members?: number;
+  topic?: string;
+}
+
+export interface SendBotRequest {
+  meeting_url: string;
+  team: string;
+  title?: string;
+  bot_name?: string;
+  transcription_provider?: string;
 }
 
 export interface IngestMeetingResponse {

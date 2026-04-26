@@ -200,6 +200,30 @@ class Store:
     def recent_events(self, limit: int = 50) -> list[IngestEvent]:
         return list(self._events[:limit])
 
+    def prune_orphan_events(self) -> int:
+        """Drop events whose team is no longer present (config + entities).
+
+        Used to clean up the activity feed when a team was removed before
+        cascade-event-cleanup existed. Idempotent — returns # of events
+        removed.
+        """
+        cfg = self.company_config()
+        registered = set((cfg.get("teams") or {}).keys())
+        in_entities = {e.team for e in self._entities.values() if e.team}
+        keep = registered | in_entities
+        with self._lock:
+            before = len(self._events)
+            self._events = [e for e in self._events if e.team in keep]
+            removed = before - len(self._events)
+            if removed and self._events_path.exists():
+                if self._events:
+                    self._events_path.write_text(
+                        "\n".join(e.model_dump_json() for e in self._events) + "\n"
+                    )
+                else:
+                    self._events_path.unlink()
+        return removed
+
     # ------------------------------------------------------------------
     # Meta (timestamps, source bookkeeping)
     # ------------------------------------------------------------------
@@ -266,8 +290,9 @@ class Store:
             cfg.get("teams", {}).pop(name, None)
 
     def forget_team_data(self, team: str) -> int:
-        """Wipe every trace of ``team``: entities, embeddings, conflicts, and
-        per-source sync state. Returns how many entities were removed.
+        """Wipe every trace of ``team``: entities, embeddings, conflicts,
+        per-source sync state, and the activity event log. Returns how many
+        entities were removed.
 
         Used both by ``DELETE /config/team/{name}`` (cascade on team removal)
         and the orphan-cleanup flow.
@@ -287,6 +312,17 @@ class Store:
                 # source_state keys are formatted "<kind>::<team>::<source_id>"
                 if f"::{team}::" in key:
                     states.pop(key, None)
+            # Activity log: drop events for this team and rewrite the file so
+            # the cleanup survives a process restart. events.jsonl is otherwise
+            # append-only.
+            self._events = [e for e in self._events if e.team != team]
+            if self._events_path.exists():
+                if self._events:
+                    self._events_path.write_text(
+                        "\n".join(e.model_dump_json() for e in self._events) + "\n"
+                    )
+                else:
+                    self._events_path.unlink()
         return len(ids)
 
     # ------------------------------------------------------------------
@@ -370,13 +406,27 @@ class Store:
 
 
 # ---------------------------------------------------------------------------
-# Process singleton
+# Per-workspace registry of Store instances
 # ---------------------------------------------------------------------------
-_store_singleton: Optional[Store] = None
+_stores: dict[str, Store] = {}
 
 
-def get_store() -> Store:
-    global _store_singleton
-    if _store_singleton is None:
-        _store_singleton = Store()
-    return _store_singleton
+def get_store(workspace_id: str) -> Store:
+    """Return the Store for a workspace, instantiating + caching if needed.
+
+    Raises ``KeyError`` if the workspace doesn't exist in the registry.
+    """
+    if workspace_id in _stores:
+        return _stores[workspace_id]
+    from backend.workspaces import get_registry
+
+    ws = get_registry().get(workspace_id)
+    if ws is None:
+        raise KeyError(f"workspace {workspace_id!r} not found")
+    _stores[workspace_id] = Store(get_registry().store_root_for(workspace_id))
+    return _stores[workspace_id]
+
+
+def drop_store(workspace_id: str) -> None:
+    """Forget the cached Store for a workspace (after deletion)."""
+    _stores.pop(workspace_id, None)
