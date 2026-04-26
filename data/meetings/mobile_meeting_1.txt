@@ -1,0 +1,9 @@
+Speaker C: Hey everyone. First item — we need to build our own login module for the app. The current flow is too slow.
+Speaker D: Agreed. I'll build a native authentication screen with biometrics support. We can handle JWT locally.
+Speaker C: Perfect. Also, for the v2 release, we're heavily using the REST payment endpoint. We need it to be stable.
+Speaker D: Yeah, I heard backend might be changing something with the APIs. Should we check with them?
+Speaker C: I'm sure it's fine. The REST endpoints have been stable for months. Let's not block on that.
+Speaker D: Okay. Next topic — push notifications. Users are complaining about duplicates.
+Speaker C: Let's build a deduplication layer on our side. We can cache notification IDs and filter duplicates before displaying.
+Speaker D: Sounds good. Also, for onboarding — I think 5 steps is the right number. We need email verification, profile setup, preferences, tutorial, and the welcome screen.
+Speaker C: Five steps is perfect. Marketing already approved that flow. Let's start implementation this week.

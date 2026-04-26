@@ -1,0 +1,42 @@
+{
+  "repo_name": "novatech/mobile-app",
+  "pull_requests": [
+    {
+      "number": 87,
+      "title": "feat: Native authentication screen with biometrics",
+      "state": "open",
+      "description": "Building a fully native login screen with Face ID and fingerprint support. Handles JWT token storage in secure keychain. Does NOT use the backend auth gateway — connects directly to the auth service.",
+      "files": ["src/auth/LoginScreen.tsx", "src/auth/BiometricAuth.ts", "src/auth/TokenStorage.ts"]
+    },
+    {
+      "number": 86,
+      "title": "feat: Payment v2 integration with REST API",
+      "state": "merged",
+      "description": "Integrates with the backend REST payment endpoints for v2. Uses /api/v1/payments/* for all transaction operations. Critical path for the v2 release.",
+      "files": ["src/payments/PaymentService.ts", "src/payments/api.ts"]
+    },
+    {
+      "number": 85,
+      "title": "feat: Client-side notification deduplication",
+      "state": "open",
+      "description": "Adds a local cache layer to filter duplicate push notifications before displaying them.",
+      "files": ["src/notifications/DedupCache.ts", "src/notifications/NotificationHandler.ts"]
+    },
+    {
+      "number": 84,
+      "title": "feat: 5-step onboarding flow",
+      "state": "open",
+      "description": "Implements the complete 5-step onboarding: 1) Email verification, 2) Profile setup, 3) Preferences, 4) Tutorial, 5) Welcome screen.",
+      "files": ["src/onboarding/steps/EmailVerify.tsx", "src/onboarding/steps/Profile.tsx", "src/onboarding/OnboardingFlow.tsx"]
+    }
+  ],
+  "commits": [
+    {"sha": "f1g2h3i", "message": "feat: login screen UI with biometrics toggle", "author": "dev-c", "date": "2024-03-18"},
+    {"sha": "j4k5l6m", "message": "feat: JWT token secure storage in keychain", "author": "dev-c", "date": "2024-03-18"},
+    {"sha": "n7o8p9q", "message": "feat: direct connection to auth service bypassing gateway", "author": "dev-c", "date": "2024-03-19"},
+    {"sha": "r0s1t2u", "message": "feat: REST payment API integration for v2", "author": "dev-d", "date": "2024-03-17"},
+    {"sha": "v3w4x5y", "message": "feat: notification ID cache with AsyncStorage", "author": "dev-d", "date": "2024-03-18"},
+    {"sha": "z6a7b8c", "message": "feat: onboarding step 1 - email verification", "author": "dev-c", "date": "2024-03-19"},
+    {"sha": "d9e0f1g", "message": "feat: onboarding step 2 - profile setup", "author": "dev-c", "date": "2024-03-19"}
+  ]
+}

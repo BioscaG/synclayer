@@ -1,0 +1,9 @@
+Speaker A: Alright team, let's talk about the auth module. We've decided to go with JWT tokens for the new authentication service.
+Speaker B: Makes sense. I'll implement the token generation and validation. Should we use RSA or HMAC for signing?
+Speaker A: Let's go with RSA, it's more secure for our use case. Also, I want to migrate the user API to GraphQL this sprint.
+Speaker B: Wait, didn't we agree on REST last week? The mobile team is already consuming our REST endpoints.
+Speaker A: I know, but GraphQL gives us better flexibility. We'll keep the REST endpoints running in parallel for now.
+Speaker B: Okay. Also, we need to refactor the payment processing module. The current implementation has too much technical debt.
+Speaker A: Agreed. Let's plan that for next sprint. The payment refactor depends on the new database schema that Carlos is working on.
+Speaker B: One more thing — I'm worried about the notification system. We're getting a lot of duplicate notifications in production.
+Speaker A: Let's build a new notification service from scratch. I'll start with the architecture doc this week.

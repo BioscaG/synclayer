@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-paper text-ink font-sans;
+    font-feature-settings: "ss01" on, "cv11" on;
+  }
+  hr {
+    @apply border-rule;
+  }
+  ::selection {
+    @apply bg-accentSoft text-accent;
+  }
+}
+
+@layer components {
+  /* Editorial typography helpers */
+  .eyebrow {
+    @apply font-mono text-eyebrow uppercase text-muted;
+  }
+  .display {
+    @apply font-serif font-normal tracking-tight text-ink;
+  }
+  .figure-num {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Surface card with hairline rule */
+  .panel {
+    @apply bg-paper border border-rule rounded;
+  }
+  .panel-soft {
+    @apply bg-surface border border-rule rounded;
+  }
+
+  /* Rule above section */
+  .rule-top {
+    @apply border-t border-rule pt-8;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-meta font-medium
+           border border-rule2 rounded transition-colors duration-150
+           text-ink hover:bg-surface;
+  }
+  .btn-primary {
+    @apply bg-ink text-paper border-ink hover:bg-graphite;
+  }
+  .btn-ghost {
+    @apply border-transparent hover:bg-surface;
+  }
+  .btn-danger {
+    @apply text-critical border-critical/30 hover:bg-critical/5;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full px-3 py-2 text-body bg-paper border border-rule2 rounded
+           placeholder:text-dim focus:outline-none focus:border-ink transition-colors;
+  }
+
+  /* Pills / tags */
+  .tag {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-eyebrow font-mono uppercase
+           border border-rule2 rounded-sm text-slate;
+  }
+  .tag-accent   { @apply text-accent border-accent/30 bg-accentSoft/40; }
+  .tag-critical { @apply text-critical border-critical/30 bg-critical/5; }
+  .tag-warning  { @apply text-warning border-warning/30 bg-warning/5; }
+  .tag-success  { @apply text-success border-success/30 bg-success/5; }
+
+  /* Severity bar (left edge of conflict cards) */
+  .severity-bar {
+    @apply absolute left-0 top-0 bottom-0 w-[3px];
+  }
+
+  /* Editorial divider with optional centered glyph */
+  .divider {
+    @apply relative my-10 border-t border-rule;
+  }
+}

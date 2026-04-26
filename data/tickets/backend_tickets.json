@@ -1,0 +1,7 @@
+[
+  {"id":"BACK-201","title":"Implement JWT authentication service","status":"in_progress","assignee":"dev-b","priority":"high","description":"Build centralized JWT auth service with RSA signing. Must support token refresh and blacklisting.","labels":["auth","security","sprint-12"]},
+  {"id":"BACK-202","title":"Migrate user API to GraphQL","status":"in_progress","assignee":"dev-a","priority":"high","description":"Replace all REST user endpoints with GraphQL. Breaking change for consumers.","labels":["api","graphql","breaking-change"]},
+  {"id":"BACK-203","title":"Refactor payment processing module","status":"todo","assignee":"dev-a","priority":"medium","description":"Clean up payment processing. Depends on new DB schema.","labels":["payments","refactor"]},
+  {"id":"BACK-204","title":"Build notification service","status":"in_progress","assignee":"dev-b","priority":"medium","description":"New centralized notification service with Redis deduplication.","labels":["notifications","new-service"]},
+  {"id":"BACK-205","title":"Fix duplicate notification bug","status":"todo","assignee":"unassigned","priority":"high","description":"Users reporting duplicate push notifications. Root cause unclear.","labels":["bug","notifications","urgent"]}
+]

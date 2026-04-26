@@ -1,0 +1,6 @@
+[
+  {"id":"INF-401","title":"Deprecate legacy API server","status":"in_progress","assignee":"dev-e","priority":"critical","description":"Shut down legacy API server by end of week. Migrate all traffic to new Kubernetes cluster.","labels":["infrastructure","deprecation","critical"]},
+  {"id":"INF-402","title":"Configure API gateway for auth","status":"todo","assignee":"dev-e","priority":"high","description":"All authentication requests must go through the new API gateway with rate limiting. No direct access.","labels":["gateway","auth","security"]},
+  {"id":"INF-403","title":"Build centralized notification service","status":"planning","assignee":"dev-f","priority":"medium","description":"Centralized notification platform using Redis for deduplication. Replace all team-specific implementations.","labels":["notifications","platform"]},
+  {"id":"INF-404","title":"Enforce 3-step onboarding maximum","status":"todo","assignee":"dev-f","priority":"medium","description":"Product mandate: onboarding must be maximum 3 steps. Enforce via API validation.","labels":["onboarding","product"]}
+]

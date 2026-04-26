@@ -1,0 +1,43 @@
+{
+  "repo_name": "novatech/backend-api",
+  "pull_requests": [
+    {
+      "number": 142,
+      "title": "feat: Migrate user endpoints to GraphQL",
+      "state": "open",
+      "description": "This PR migrates all user-related endpoints from REST to GraphQL. Includes schema definitions, resolvers, and mutations for user CRUD operations. Breaking change: REST endpoints /api/v1/users/* will be removed.",
+      "files": ["src/graphql/schema.ts", "src/graphql/resolvers/user.ts", "src/routes/users.ts"]
+    },
+    {
+      "number": 141,
+      "title": "feat: JWT authentication with RSA signing",
+      "state": "merged",
+      "description": "Implements JWT token generation and validation using RSA-256. Includes refresh token rotation and token blacklisting.",
+      "files": ["src/auth/jwt.ts", "src/auth/keys.ts", "src/middleware/auth.ts"]
+    },
+    {
+      "number": 139,
+      "title": "refactor: Payment processing module cleanup",
+      "state": "open",
+      "description": "Initial cleanup of the payment processing module. Extracting shared logic, improving error handling.",
+      "files": ["src/payments/processor.ts", "src/payments/validators.ts"]
+    },
+    {
+      "number": 138,
+      "title": "feat: Add notification service scaffolding",
+      "state": "draft",
+      "description": "Setting up the new centralized notification service. Redis-backed deduplication, support for push, email, and SMS channels.",
+      "files": ["src/notifications/service.ts", "src/notifications/dedup.ts"]
+    }
+  ],
+  "commits": [
+    {"sha": "a1b2c3d", "message": "feat: add GraphQL schema for user type", "author": "dev-a", "date": "2024-03-18"},
+    {"sha": "e4f5g6h", "message": "feat: implement user query resolvers", "author": "dev-a", "date": "2024-03-18"},
+    {"sha": "i7j8k9l", "message": "BREAKING: deprecate REST user endpoints", "author": "dev-a", "date": "2024-03-19"},
+    {"sha": "m0n1o2p", "message": "feat: JWT token generation with RSA-256", "author": "dev-b", "date": "2024-03-17"},
+    {"sha": "q3r4s5t", "message": "feat: add refresh token rotation logic", "author": "dev-b", "date": "2024-03-17"},
+    {"sha": "u6v7w8x", "message": "fix: payment validation edge case with refunds", "author": "dev-a", "date": "2024-03-16"},
+    {"sha": "y9z0a1b", "message": "chore: scaffold notification service with Redis", "author": "dev-b", "date": "2024-03-19"},
+    {"sha": "c2d3e4f", "message": "feat: notification deduplication using Redis sets", "author": "dev-b", "date": "2024-03-19"}
+  ]
+}

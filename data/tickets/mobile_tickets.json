@@ -1,0 +1,7 @@
+[
+  {"id":"MOB-301","title":"Build native authentication screen","status":"in_progress","assignee":"dev-c","priority":"high","description":"Native login with biometrics. Direct connection to auth service (no gateway). JWT storage in secure keychain.","labels":["auth","native"]},
+  {"id":"MOB-302","title":"Payment v2 REST API integration","status":"done","assignee":"dev-d","priority":"critical","description":"Integrate with backend REST payment endpoints /api/v1/payments/* for v2 release.","labels":["payments","rest-api","v2"]},
+  {"id":"MOB-303","title":"Client-side notification deduplication","status":"in_progress","assignee":"dev-d","priority":"medium","description":"Cache notification IDs locally to prevent duplicates. Temporary fix.","labels":["notifications","workaround"]},
+  {"id":"MOB-304","title":"Implement 5-step onboarding flow","status":"in_progress","assignee":"dev-c","priority":"medium","description":"5-step onboarding: email verify, profile, preferences, tutorial, welcome.","labels":["onboarding","ux"]},
+  {"id":"MOB-305","title":"Migrate to new API endpoints","status":"backlog","assignee":"unassigned","priority":"low","description":"Migrate from REST to whatever new API format backend decides on.","labels":["api","migration","future"]}
+]

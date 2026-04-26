@@ -1,0 +1,9 @@
+Speaker E: Alright, big update — we're deprecating the legacy API server next Friday. Everything moves to the new Kubernetes cluster.
+Speaker F: That's aggressive. Have all teams been notified? The mobile app still hits the legacy server for payments.
+Speaker E: I sent a Slack message last month. They should have migrated by now. We can't keep the old server running, it's costing us too much.
+Speaker F: Okay. Also, about authentication — all auth requests need to go through the new API gateway with rate limiting. No direct access to the auth service.
+Speaker E: Agreed. I'll configure the gateway rules this week. Any team that's building auth needs to integrate with our gateway first.
+Speaker F: Speaking of which, should we build a centralized notification service? I keep hearing about duplicate notification issues from multiple teams.
+Speaker E: That's a great idea. One service to rule them all. We can use Redis for deduplication and ensure consistency.
+Speaker F: Perfect. Last thing — the onboarding flow. Product told me it should be maximum 3 steps. They want it super streamlined — just email, password, and go.
+Speaker E: That contradicts what I heard from the mobile team. They mentioned 5 steps. We need to align on this.

@@ -1,0 +1,11 @@
+{
+  "channel": "mobile-eng",
+  "messages": [
+    {"user": "diego", "text": "I'll take care of the new login screen. Going native with biometrics, JWT in keychain"},
+    {"user": "elena", "text": "are we plugging into the infra gateway? I heard they want all auth through it"},
+    {"user": "diego", "text": "nah, going direct to the auth service for now. Faster to ship"},
+    {"user": "elena", "text": "v2 ships next Thursday, REST payment integration is rock solid"},
+    {"user": "diego", "text": "5-step onboarding looks great in QA. Marketing approved the flow already"},
+    {"user": "elena", "text": "ok shipping the onboarding next week then"}
+  ]
+}

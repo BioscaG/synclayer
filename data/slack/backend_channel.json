@@ -1,0 +1,11 @@
+{
+  "channel": "backend-eng",
+  "messages": [
+    {"user": "alice", "text": "fyi I'm gonna ship the GraphQL user PR on Friday — REST endpoints will be removed two weeks after"},
+    {"user": "bob", "text": "wait, mobile is still hitting /api/v1/users — did anyone tell them?"},
+    {"user": "alice", "text": "I'll drop a note in #mobile later. They'll be fine, they have time"},
+    {"user": "carol", "text": "I'm worried about the notification duplicates. We keep paging at 2am for the same thing"},
+    {"user": "bob", "text": "let's just centralize the notification service on our side. I'll start the scaffold"},
+    {"user": "alice", "text": "we need the new DB schema from Carlos before we can refactor payments — blocking BACK-203"}
+  ]
+}
