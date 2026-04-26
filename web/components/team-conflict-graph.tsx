@@ -5,10 +5,10 @@ import type { Conflict, ConflictType } from "@/lib/types";
 import { cn, teamColor } from "@/lib/utils";
 
 const TYPE_COLORS: Record<ConflictType, string> = {
-  duplication: "#B91C1C",
-  contradiction: "#A16207",
+  duplication: "#DC2626",
+  contradiction: "#D97706",
   dependency: "#7C3AED",
-  say_vs_do: "#0E7490",
+  say_vs_do: "#0891B2",
 };
 
 const TYPE_LABEL: Record<ConflictType, string> = {

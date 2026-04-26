@@ -29,12 +29,12 @@ export function Topbar() {
   return (
     <header className="sticky top-0 z-20 bg-paper/85 backdrop-blur border-b border-rule">
       <div className="h-16 flex items-center gap-6 px-6 lg:px-8">
-        <div className="flex items-baseline gap-3 min-w-0">
-          <span className="text-meta font-mono text-muted hidden sm:inline">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-meta text-muted hidden sm:inline">
             Workspace
           </span>
-          <span className="text-meta text-muted font-mono">/</span>
-          <span className="font-serif text-lead truncate">
+          <span className="text-meta text-muted">/</span>
+          <span className="text-lead font-semibold truncate">
             {companyName || "—"}
           </span>
         </div>

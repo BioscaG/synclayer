@@ -26,13 +26,17 @@ def _is_say_vs_do(a: Entity, b: Entity) -> bool:
 
 def _classify_type(relationship: str, a: Entity, b: Entity) -> ConflictType | None:
     if relationship == "same_concept":
-        # Same concept across SAY (meeting/slack) vs DO (code) is the most
-        # interesting signal even if same team — it's a SAY_VS_DO mismatch.
-        if _is_say_vs_do(a, b):
-            return ConflictType.SAY_VS_DO
+        # Cross-team duplication has top priority: if team A plans to build
+        # something team B already has (or is building), the actionable
+        # signal is "don't duplicate work" — even if the source pair looks
+        # like meeting-vs-github (which would otherwise be SAY_VS_DO).
         if a.team != b.team:
             return ConflictType.DUPLICATION
-        return None  # same concept, same team, both said: nothing notable
+        # Same team, meeting/slack vs github: classic say-vs-do mismatch
+        # (we said one thing in the room, the code does another).
+        if _is_say_vs_do(a, b):
+            return ConflictType.SAY_VS_DO
+        return None  # same team, same source family — not notable
     if relationship == "conflicting":
         return ConflictType.CONTRADICTION
     if relationship == "dependent":
@@ -57,32 +61,38 @@ def _severity(
 
 
 def _recommendation(conflict_type: ConflictType, a: Entity, b: Entity) -> str:
+    """One-sentence action. Kept terse — the dashboard renders it as a single
+    row, not a paragraph."""
     team_a, team_b = a.team, b.team
+
     if conflict_type == ConflictType.DUPLICATION:
-        return (
-            f"⚠️ {team_a} and {team_b} are both working on '{a.name}' / '{b.name}'. "
-            f"Hold a 30-minute alignment meeting before more code is written, "
-            f"and assign a single owner."
+        # Surface the side that's already in code (vs the side that's planning),
+        # so the recommendation reads like "B already has this; A reuse it".
+        coded = next(
+            (e for e in (a, b) if e.source_type == SourceType.GITHUB), None
         )
+        if coded is not None:
+            other = b if coded is a else a
+            return (
+                f"{coded.team} already has this in code — {other.team} should "
+                f"reuse before building."
+            )
+        return f"Pick a single owner between {team_a} and {team_b} before more code lands."
+
     if conflict_type == ConflictType.CONTRADICTION:
-        return (
-            f"❗ {team_a} and {team_b} have made conflicting decisions about "
-            f"'{a.name}' vs '{b.name}'. Escalate to leadership immediately and "
-            f"reconcile before either side ships."
-        )
+        return f"{team_a} and {team_b} disagree — escalate and reconcile before either ships."
+
     if conflict_type == ConflictType.HIDDEN_DEPENDENCY:
-        return (
-            f"🔗 {team_b} depends on {team_a}'s decision around '{a.name}'. "
-            f"Notify {team_b} this week and confirm timelines align."
-        )
+        return f"{team_b} depends on {team_a}'s decision — confirm timelines align."
+
     if conflict_type == ConflictType.SAY_VS_DO:
         spoken = a if a.source_type in {SourceType.MEETING, SourceType.SLACK} else b
         coded = b if spoken is a else a
         return (
-            f"🚨 Code in {coded.team} ('{coded.name}') diverges from what was said "
-            f"in {spoken.source_type.value} ('{spoken.name}'). Confirm whether the "
-            f"verbal decision was reversed — if not, revert or update the spec."
+            f"Code in {coded.team} diverges from what {spoken.team} said — "
+            f"reconcile or revert."
         )
+
     return "Review with both teams."
 
 

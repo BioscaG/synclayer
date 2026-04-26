@@ -29,13 +29,13 @@ export function KpiCard({
   tone = "default",
 }: KpiCardProps) {
   return (
-    <div className="panel p-5 flex flex-col gap-4">
+    <div className="panel p-5 flex flex-col gap-3.5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="eyebrow mb-2">{label}</div>
+          <div className="eyebrow mb-2.5">{label}</div>
           <div
             className={cn(
-              "figure-num font-medium text-h1 leading-none",
+              "figure-num text-figure leading-none",
               TONE_TEXT[tone]
             )}
           >

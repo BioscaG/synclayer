@@ -10,11 +10,11 @@ interface SparklineProps {
 }
 
 const TONE_STROKE: Record<string, string> = {
-  default: "#1F1F1F",
-  accent: "#1F4287",
-  critical: "#B91C1C",
-  warning: "#A16207",
-  success: "#15803D",
+  default: "#27272A",
+  accent: "#4F46E5",
+  critical: "#DC2626",
+  warning: "#D97706",
+  success: "#059669",
 };
 
 export function Sparkline({

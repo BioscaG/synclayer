@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const serif = Source_Serif_4({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["400", "500", "600"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
 });
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -28,10 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${serif.variable} ${mono.variable}`}
-    >
+    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body className="bg-surface">
         <Sidebar />
         <div className="md:pl-60 min-h-screen flex flex-col">

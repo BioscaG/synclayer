@@ -56,14 +56,14 @@ export function teamColor(team: string, palette = TEAM_PALETTE): string {
 }
 
 export const TEAM_PALETTE = [
-  "#1F4287",
-  "#15803D",
-  "#A16207",
-  "#7C3AED",
-  "#BE185D",
-  "#0E7490",
-  "#9F1239",
-  "#365314",
+  "#6366F1", // indigo-500
+  "#10B981", // emerald-500
+  "#F59E0B", // amber-500
+  "#8B5CF6", // violet-500
+  "#F43F5E", // rose-500
+  "#06B6D4", // cyan-500
+  "#EF4444", // red-500
+  "#84CC16", // lime-500
 ];
 
 export const SEVERITY_LABEL: Record<string, string> = {

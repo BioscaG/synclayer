@@ -17,17 +17,17 @@ import { DonutChart } from "@/components/charts/donut-chart";
 import { CONFLICT_LABEL, formatRelative } from "@/lib/utils";
 
 const SOURCE_COLORS = {
-  meeting: "#1F4287",
-  github: "#0A0A0A",
-  slack: "#7C3AED",
-  ticket: "#A16207",
+  meeting: "#4F46E5",  // indigo-600 — accent
+  github: "#18181B",   // zinc-900
+  slack: "#7C3AED",    // violet-600
+  ticket: "#D97706",   // amber-600
 } as const;
 
 const TYPE_COLORS: Record<string, string> = {
-  duplication: "#B91C1C",
-  contradiction: "#A16207",
-  dependency: "#7C3AED",
-  say_vs_do: "#0E7490",
+  duplication: "#DC2626",   // red-600
+  contradiction: "#D97706", // amber-600
+  dependency: "#7C3AED",    // violet-600
+  say_vs_do: "#0891B2",     // cyan-600
 };
 
 export default function OverviewPage() {
@@ -82,7 +82,7 @@ export default function OverviewPage() {
   const donutData = Object.entries(byType).map(([t, v]) => ({
     name: CONFLICT_LABEL[t] || t,
     value: v,
-    color: TYPE_COLORS[t] || "#4A4A4A",
+    color: TYPE_COLORS[t] || "#71717A",
   }));
 
   const areaData = (history?.daily_entities || []).map((d) => ({ ...d }));
