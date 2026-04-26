@@ -177,3 +177,28 @@ export interface IngestMeetingResponse {
   } | null;
   new_conflicts: Conflict[];
 }
+
+export type ChatRole = "user" | "assistant";
+export type ChatStatus =
+  | "found"
+  | "partial"
+  | "not_found"
+  | "empty"
+  | "model_unavailable";
+
+export interface ChatTurn {
+  role: ChatRole;
+  content: string;
+}
+
+export interface ChatMatch {
+  entity: Entity;
+  score: number;
+}
+
+export interface ChatResponse {
+  answer: string;
+  matches: ChatMatch[];
+  status: ChatStatus;
+  used_model: string;
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ChatDrawer } from "@/components/chat-drawer";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
     >
       <body className="bg-surface">
         <Sidebar />
+        <ChatDrawer />
         <div className="md:pl-60 min-h-screen flex flex-col">
           <Topbar />
           <main className="flex-1 px-6 lg:px-8 py-8">{children}</main>

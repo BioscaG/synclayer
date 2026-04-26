@@ -1,6 +1,8 @@
 // Thin HTTP wrapper. All requests go through /api/* which Next rewrites to FastAPI.
 
 import type {
+  ChatResponse,
+  ChatTurn,
   CompanyConfig,
   Conflict,
   Entity,
@@ -104,6 +106,13 @@ export const api = {
 
   // Bulk
   analyze: () => http<any>("/analyze", { method: "POST" }),
+
+  // Feature chatbot
+  chat: (message: string, history: ChatTurn[] = []) =>
+    http<ChatResponse>("/chat", {
+      method: "POST",
+      body: JSON.stringify({ message, history }),
+    }),
 
   // Live sync state (per-source last_synced / last_error / last_activity)
   syncStatus: () => http<SyncStatus>("/sync/status"),

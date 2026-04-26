@@ -16,4 +16,8 @@ npm run dev
 `next.config.ts` proxies `/api/*` to the FastAPI server (default `http://localhost:8000`).
 Override with `BACKEND_URL=http://...` if you run the API elsewhere.
 
+The Next.js dashboard includes a feature chat drawer wired to `POST /chat`.
+It searches the backend's local project memory and shows the evidence used for
+each answer.
+
 The bundled Streamlit dashboard (`frontend/app.py`) still works as a fallback.

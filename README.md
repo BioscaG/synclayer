@@ -81,6 +81,7 @@ Selected endpoints exposed by `backend/main.py`:
 | `POST` | `/sync/github/{owner}/{repo}?team=…` | Live PyGithub fetch |
 | `POST` | `/sync/slack/{channel_id}?team=…` | Live Slack fetch |
 | `POST` | `/analyze` | Run the full pipeline against current state |
+| `POST` | `/chat` | Ask the retrieval-grounded feature chatbot against local project memory |
 | `GET`  | `/entities` `/conflicts` `/events` `/graph` `/graph/html` `/report` | Read endpoints |
 | `POST` | `/reset` | Clear in-memory state |
 
@@ -103,6 +104,7 @@ Selected endpoints exposed by `backend/main.py`:
 synclayer/
 ├── backend/
 │   ├── main.py                  # FastAPI app
+│   ├── chat.py                  # retrieval-grounded feature chatbot
 │   ├── config.py                # env-driven settings
 │   ├── extractors/              # meeting · github · slack · tickets
 │   ├── semantic/                # embeddings + Claude normalizer

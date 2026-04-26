@@ -26,6 +26,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
+from backend.chat import ChatRequest, ChatResponse, answer_chat
 from backend.config import POLL_INTERVAL_SECONDS
 from backend.detection.conflict import classify_conflicts
 from backend.extractors.meeting import process_meeting
@@ -438,6 +439,11 @@ def analyze():
         raise HTTPException(400, "Need at least 2 entities to analyze")
     summary, _new = _run_full_analysis(store)
     return AnalysisResponse(**{k: v for k, v in summary.items() if k in AnalysisResponse.model_fields})
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(req: ChatRequest):
+    return answer_chat(get_store(), req)
 
 
 # ---------------------------------------------------------------------------
