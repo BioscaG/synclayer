@@ -25,8 +25,6 @@ export function Topbar() {
   useEffect(() => {
     loadWorkspaces();
     const id = setInterval(loadWorkspaces, 8000);
-    // Pages that mutate the workspace registry dispatch this so the topbar
-    // updates instantly instead of waiting for the next poll tick.
     const onChange = () => loadWorkspaces();
     window.addEventListener("synclayer:config-changed", onChange);
     return () => {
@@ -39,7 +37,7 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-20 bg-paper/85 backdrop-blur border-b border-rule">
-      <div className="h-16 flex items-center gap-6 px-6 lg:px-8">
+      <div className="h-14 flex items-center justify-between gap-6 px-6 lg:px-8">
         <div className="relative">
           <button
             type="button"
@@ -48,15 +46,15 @@ export function Topbar() {
           >
             {current && (
               <span
-                className="inline-block w-2 h-2 rounded-sm shrink-0"
+                className="inline-block w-1.5 h-1.5 rounded-sm shrink-0"
                 style={{ backgroundColor: current.color }}
               />
             )}
-            <span className="text-lead font-semibold truncate">
+            <span className="text-body font-semibold truncate">
               {current?.name || "—"}
             </span>
             <ChevronDown
-              size={14}
+              size={13}
               className={cn(
                 "text-muted transition-transform shrink-0",
                 open && "rotate-180"
@@ -71,7 +69,7 @@ export function Topbar() {
                 onClick={() => setOpen(false)}
                 className="fixed inset-0 z-10 cursor-default"
               />
-              <div className="absolute left-0 top-full mt-1.5 z-20 panel min-w-[260px] py-1 max-h-[60vh] overflow-y-auto">
+              <div className="absolute left-0 top-full mt-1.5 z-20 panel min-w-[280px] py-1 max-h-[60vh] overflow-y-auto">
                 <div className="px-3 py-1.5 eyebrow">Switch workspace</div>
                 {workspaces.map((w) => (
                   <Link
@@ -84,12 +82,12 @@ export function Topbar() {
                     )}
                   >
                     <span
-                      className="inline-block w-2 h-2 rounded-sm shrink-0"
+                      className="inline-block w-1.5 h-1.5 rounded-sm shrink-0"
                       style={{ backgroundColor: w.color }}
                     />
                     <span className="text-body truncate flex-1">{w.name}</span>
-                    <span className="font-mono text-eyebrow text-muted shrink-0">
-                      {w.entities}e · {w.teams}t
+                    <span className="data-mono text-eyebrow text-muted shrink-0">
+                      {w.entities}
                     </span>
                   </Link>
                 ))}

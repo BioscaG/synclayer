@@ -5,10 +5,10 @@ import type { Conflict, ConflictType } from "@/lib/types";
 import { cn, teamColor } from "@/lib/utils";
 
 const TYPE_COLORS: Record<ConflictType, string> = {
-  duplication: "#DC2626",
-  contradiction: "#D97706",
-  dependency: "#7C3AED",
-  say_vs_do: "#0891B2",
+  duplication: "#B91C1C",   // critical (deeper red)
+  contradiction: "#B45309", // warning (deeper amber)
+  dependency: "#1E3A8A",    // cobalt accent
+  say_vs_do: "#0F1419",     // ink near-black
 };
 
 const TYPE_LABEL: Record<ConflictType, string> = {
@@ -197,7 +197,7 @@ export function TeamConflictGraph({
           const dim =
             (hoveredTeam && !involves) || (hoveredEdge && hoveredEdge !== id);
 
-          const stroke = TYPE_COLORS[e.type] || "#71717A";
+          const stroke = TYPE_COLORS[e.type] || "#8A8E94";
           const width = Math.min(5, 1.25 + e.severityWeight * 0.5);
 
           return (

@@ -13,7 +13,7 @@
   }
   body {
     @apply bg-surface text-ink font-sans;
-    font-feature-settings: "ss01" on, "cv11" on;
+    font-feature-settings: "ss01" on, "cv11" on, "tnum" on;
   }
   hr {
     @apply border-rule;
@@ -24,45 +24,49 @@
 }
 
 @layer components {
-  /* Eyebrow / small label — back to mono uppercase. The "engineering tool"
-     signature. Used everywhere a tag or label is needed. */
+  /* Eyebrow — small uppercase label. Used SPARINGLY now (page headers
+     and section labels only). Inter at small size, not mono. */
   .eyebrow {
-    @apply font-mono text-eyebrow font-medium uppercase text-muted tracking-wider;
+    @apply text-eyebrow font-medium uppercase text-muted tracking-[0.08em];
   }
 
-  /* Headline — Inter semibold, tight tracking. */
+  /* Headline — Inter heavy with negative tracking. */
   .display {
     @apply font-sans font-semibold tracking-tight text-ink;
   }
 
-  /* Numerical display — mono tabular. Used for KPIs, similarity scores,
-     timestamps, IDs. The single biggest design tell that this is a tool,
-     not a marketing page. */
+  /* Numerical display — Inter tabular for KPI numbers. Mono is reserved
+     for atomic data (IDs, SHAs, timestamps). */
   .figure-num {
-    @apply font-mono tabular-nums font-medium tracking-tight;
+    @apply font-sans tabular-nums font-semibold tracking-tight;
   }
 
-  /* Mono utility shortcuts for tags / chips / labels. */
-  .mono-label {
-    @apply font-mono text-meta tracking-wide;
+  /* Atomic data — short alphanumeric strings that read as code/IDs. */
+  .data-mono {
+    @apply font-mono tabular-nums tracking-tight;
   }
 
-  /* Cards — flat: white panel, warm hairline border, no shadow. */
+  /* Cards: hairline only, no shadow. Sharp 5-6px radius. */
   .panel {
-    @apply bg-paper border border-rule rounded;
+    @apply bg-paper border border-rule rounded-md;
   }
   .panel-soft {
-    @apply bg-surface border border-rule rounded;
+    @apply bg-surface border border-rule rounded-md;
+  }
+
+  /* Highlight panel — used once, for the hero KPI. */
+  .panel-hero {
+    @apply bg-paper border border-rule rounded-md p-7;
   }
 
   .rule-top {
     @apply border-t border-rule pt-6;
   }
 
-  /* Buttons — sharp corners, subtle. */
+  /* Buttons — black primary CTA (Vercel-style), outlined secondary. */
   .btn {
     @apply inline-flex items-center justify-center px-3 py-1.5 text-meta font-medium
-           border border-rule2 rounded-sm transition-colors duration-150
+           border border-rule2 rounded transition-colors duration-150
            text-ink bg-paper hover:bg-surface;
   }
   .btn-primary {
@@ -77,20 +81,21 @@
 
   /* Inputs */
   .input {
-    @apply w-full px-3 py-1.5 text-body bg-paper border border-rule2 rounded-sm
-           placeholder:text-dim focus:outline-none focus:border-ink transition-colors;
+    @apply w-full px-3 py-1.5 text-body bg-paper border border-rule2 rounded
+           placeholder:text-dim focus:outline-none focus:border-ink
+           focus:ring-2 focus:ring-accent/15 transition-colors;
   }
 
-  /* Tags — mono small caps, the "engineering tool" signature. */
+  /* Tags — Inter (not mono) at small size with weight. Solid colored chips
+     for severities, outlined for neutral. */
   .tag {
-    @apply inline-flex items-center gap-1.5 px-1.5 py-0.5 text-eyebrow font-mono
-           font-medium uppercase tracking-wider border border-rule2 rounded-sm
-           text-slate;
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-eyebrow font-medium
+           uppercase tracking-[0.08em] border border-rule2 rounded-sm text-slate;
   }
   .tag-accent   { @apply text-accent border-accent/30 bg-accentSoft; }
-  .tag-critical { @apply text-critical border-critical/30 bg-critical/5; }
-  .tag-warning  { @apply text-warning border-warning/30 bg-warning/5; }
-  .tag-success  { @apply text-success border-success/30 bg-success/5; }
+  .tag-critical { @apply text-paper border-critical bg-critical; }
+  .tag-warning  { @apply text-paper border-warning bg-warning; }
+  .tag-success  { @apply text-paper border-success bg-success; }
 
   /* Severity bar (left edge of conflict cards) */
   .severity-bar {
@@ -99,10 +104,5 @@
 
   .divider {
     @apply relative my-8 border-t border-rule;
-  }
-
-  /* Subtle dotted divider — used between dense list items */
-  .row-divider {
-    @apply border-t border-dotted border-rule;
   }
 }

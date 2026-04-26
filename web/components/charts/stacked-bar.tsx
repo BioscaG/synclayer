@@ -43,14 +43,14 @@ export function StackedBar({
         >
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#E4E4E7"
+            stroke="#E5E2DC"
             horizontal={isHorizontal}
             vertical={!isHorizontal}
           />
           <XAxis
             type={isHorizontal ? "category" : "number"}
             dataKey={isHorizontal ? xKey : undefined}
-            stroke="#71717A"
+            stroke="#8A8E94"
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
@@ -59,7 +59,7 @@ export function StackedBar({
           <YAxis
             type={isHorizontal ? "number" : "category"}
             dataKey={isHorizontal ? undefined : xKey}
-            stroke="#71717A"
+            stroke="#8A8E94"
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
@@ -69,15 +69,15 @@ export function StackedBar({
           <Tooltip
             cursor={{ fill: "rgba(0,0,0,0.03)" }}
             contentStyle={{
-              border: "1px solid #E4E4E7",
+              border: "1px solid #E5E2DC",
               borderRadius: 4,
               background: "#FFFFFF",
               fontSize: 12,
               fontFamily: "JetBrains Mono, monospace",
-              color: "#18181B",
+              color: "#0F1419",
             }}
-            labelStyle={{ color: "#71717A" }}
-            itemStyle={{ color: "#18181B" }}
+            labelStyle={{ color: "#8A8E94" }}
+            itemStyle={{ color: "#0F1419" }}
           />
           {series.map((s, i) => (
             <Bar

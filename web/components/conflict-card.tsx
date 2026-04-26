@@ -25,15 +25,15 @@ const SEVERITY_TEXT: Record<string, string> = {
 };
 
 const SOURCE_LABEL: Record<string, string> = {
-  meeting: "meeting",
-  github: "repo",
-  slack: "slack",
-  ticket: "ticket",
+  meeting: "Meeting",
+  github: "Repo",
+  slack: "Slack",
+  ticket: "Ticket",
 };
 
 export function ConflictCard({
   conflict,
-  compact = false,
+  compact: _compact,
 }: {
   conflict: Conflict;
   compact?: boolean;
@@ -42,87 +42,48 @@ export function ConflictCard({
   const sev = conflict.severity;
   const a = conflict.entity_a;
   const b = conflict.entity_b;
-  const typeLabel = (
-    CONFLICT_LABEL[conflict.conflict_type] || conflict.conflict_type
-  ).toLowerCase();
-
-  if (compact) {
-    return (
-      <article className="relative panel pl-4 pr-4 py-3 mb-2 overflow-hidden">
-        <div className={cn("severity-bar", SEVERITY_BAR[sev])} />
-
-        <div className="flex items-center gap-2.5 min-w-0 mb-2">
-          <span
-            className={cn("w-1.5 h-1.5 rounded-full shrink-0", SEVERITY_DOT[sev])}
-          />
-          <span className="font-mono text-meta uppercase tracking-wider text-ink shrink-0">
-            {typeLabel}
-          </span>
-          <span className="text-dim text-meta shrink-0">/</span>
-          <span
-            className={cn(
-              "font-mono text-eyebrow font-medium uppercase tracking-wider shrink-0",
-              SEVERITY_TEXT[sev]
-            )}
-          >
-            {SEVERITY_LABEL[sev]}
-          </span>
-          <span className="ml-auto font-mono text-meta text-muted truncate lowercase">
-            {a.team}
-            <span className="text-dim mx-1.5">↔</span>
-            {b.team}
-          </span>
-        </div>
-
-        <div className="space-y-1">
-          <CompactEntity source={a.source_type} name={a.name} />
-          <CompactEntity source={b.source_type} name={b.name} />
-        </div>
-      </article>
-    );
-  }
+  const typeLabel = CONFLICT_LABEL[conflict.conflict_type] || conflict.conflict_type;
 
   return (
     <article className="relative panel mb-3 overflow-hidden">
       <div className={cn("severity-bar", SEVERITY_BAR[sev])} />
 
-      {/* Header — click anywhere here to expand/collapse. */}
+      {/* Header — type + severity dot + teams + chevron */}
       <button
         type="button"
         onClick={() => setExpanded((e) => !e)}
-        className="w-full text-left px-5 py-3.5 flex items-start justify-between gap-4 hover:bg-surface/50 transition-colors"
+        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-surface/40 transition-colors"
         aria-expanded={expanded}
       >
         <div className="min-w-0">
-          <div className="flex items-center gap-2.5 mb-1">
+          <div className="flex items-center gap-2.5 mb-1.5">
             <span
               className={cn(
                 "w-1.5 h-1.5 rounded-full shrink-0",
                 SEVERITY_DOT[sev]
               )}
             />
-            <span className="font-mono text-meta uppercase tracking-wider text-ink">
+            <span className="text-meta font-medium text-ink">
               {typeLabel}
             </span>
-            <span className="text-dim text-meta">/</span>
             <span
               className={cn(
-                "font-mono text-eyebrow font-medium uppercase tracking-wider",
+                "text-eyebrow font-medium",
                 SEVERITY_TEXT[sev]
               )}
             >
               {SEVERITY_LABEL[sev]}
             </span>
           </div>
-          <div className="font-mono text-meta text-muted lowercase">
-            {a.team}
-            <span className="text-dim mx-1.5">↔</span>
-            {b.team}
+          <div className="text-meta text-muted">
+            <span className="text-ink font-medium">{a.team}</span>
+            <span className="mx-2 text-dim">↔</span>
+            <span className="text-ink font-medium">{b.team}</span>
           </div>
         </div>
         <ChevronDown
-          size={16}
-          strokeWidth={2}
+          size={15}
+          strokeWidth={1.75}
           className={cn(
             "text-muted shrink-0 mt-1 transition-transform duration-150",
             expanded && "rotate-180"
@@ -130,7 +91,7 @@ export function ConflictCard({
         />
       </button>
 
-      {/* The two entities side by side. */}
+      {/* Side-by-side entity blocks */}
       <div className="border-t border-rule grid grid-cols-1 sm:grid-cols-2 sm:divide-x sm:divide-rule">
         <EntityBlock
           source={a.source_type}
@@ -150,13 +111,13 @@ export function ConflictCard({
         </div>
       </div>
 
-      {/* Context — Claude's explanation. Truncated by default; full when expanded. */}
+      {/* Context — explanation. Truncated by default. */}
       {conflict.explanation && (
-        <div className="border-t border-rule bg-surface px-5 py-3.5">
+        <div className="border-t border-rule bg-surface/60 px-5 py-3">
           <p
             className={cn(
               "text-meta text-slate leading-relaxed",
-              !expanded && "line-clamp-3"
+              !expanded && "line-clamp-2"
             )}
           >
             {conflict.explanation}
@@ -181,14 +142,19 @@ function EntityBlock({
   expanded?: boolean;
 }) {
   return (
-    <div className="px-5 py-3.5">
-      <div className="font-mono text-eyebrow font-medium uppercase tracking-wider text-muted mb-1.5">
-        {SOURCE_LABEL[source] || source}
-        <span className="text-dim mx-1.5">·</span>
-        <span className="lowercase">{team}</span>
+    <div className="px-5 py-4">
+      <div className="flex items-baseline gap-2 mb-1.5">
+        <span className="eyebrow">
+          {SOURCE_LABEL[source] || source}
+        </span>
+        <span className="text-eyebrow text-dim">·</span>
+        <span className="text-eyebrow text-muted">{team}</span>
       </div>
       <div
-        className={cn("text-body text-ink leading-snug", !expanded && "truncate")}
+        className={cn(
+          "text-body text-ink font-medium leading-snug",
+          !expanded && "truncate"
+        )}
         title={name}
       >
         {name}
@@ -196,26 +162,13 @@ function EntityBlock({
       {description && (
         <p
           className={cn(
-            "text-meta text-muted mt-1.5 leading-relaxed",
+            "text-meta text-slate mt-1.5 leading-relaxed",
             !expanded && "line-clamp-2"
           )}
         >
           {description}
         </p>
       )}
-    </div>
-  );
-}
-
-function CompactEntity({ source, name }: { source: string; name: string }) {
-  return (
-    <div className="flex items-baseline gap-2.5 min-w-0">
-      <span className="font-mono text-eyebrow font-medium uppercase tracking-wider text-muted w-14 shrink-0">
-        {SOURCE_LABEL[source] || source}
-      </span>
-      <span className="text-meta text-ink truncate" title={name}>
-        {name}
-      </span>
     </div>
   );
 }

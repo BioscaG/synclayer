@@ -10,53 +10,53 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Engineering-tool palette: warm off-white surface, Linear purple
-        // accent, slightly muted status colors. Inspired by Linear, Vercel,
-        // Anthropic.com — no Tailwind-default indigo here.
-        ink:        "#1A1A1A",
-        graphite:   "#26262A",
-        slate:      "#4A4A4F",
-        muted:      "#6F6F73",
-        dim:        "#A0A0A4",
-        rule:       "#EAE6DD",  // warm hairline
-        rule2:      "#D9D3C5",
-        surface:    "#FAF8F4",  // warm off-white
-        paper:      "#FFFFFF",
-        accent:     "#5E6AD2",  // Linear purple
-        accentSoft: "#EEEFF9",
-        critical:   "#C13832",  // muted red
-        warning:    "#B26800",  // muted amber
-        success:    "#2A8A52",  // muted emerald
+        // The Operator palette — warm cream surface, near-black ink with a
+        // subtle cool tint, cobalt as the lone accent for highlights.
+        // Status colors at the 700 tier so they read as serious, not neon.
+        ink:        "#0F1419",  // primary text + primary CTA bg
+        graphite:   "#2D3339",  // emphasis text
+        slate:      "#5A6068",  // body secondary
+        muted:      "#8A8E94",  // labels
+        dim:        "#B5B8BD",  // placeholders / disabled
+        rule:       "#E5E2DC",  // warm hairlines
+        rule2:      "#D2CFC9",  // input borders / stronger
+        surface:    "#F8F7F4",  // page bg, warm cream
+        paper:      "#FFFFFF",  // card bg
+        accent:     "#1E3A8A",  // deep cobalt — links, active, highlights only
+        accentSoft: "#DBE4F5",  // light cobalt for soft backgrounds
+        critical:   "#B91C1C",  // red-700, deeper than red-600
+        warning:    "#B45309",  // amber-700
+        success:    "#15803D",  // emerald-700
       },
       fontFamily: {
         sans: ['"Inter"', "system-ui", "sans-serif"],
         mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
-        // Legacy alias — points at sans so any leftover `font-serif` class
-        // doesn't fall back to a system serif.
+        // Legacy alias — points at sans so old class refs don't fall back.
         serif: ['"Inter"', "system-ui", "sans-serif"],
       },
       fontSize: {
-        eyebrow: ["10.5px", { lineHeight: "14px", letterSpacing: "0.06em" }],
-        meta:    ["12.5px", { lineHeight: "18px" }],
-        body:    ["14px", { lineHeight: "22px" }],
-        lead:    ["15.5px", { lineHeight: "24px" }],
-        h3:      ["16px", { lineHeight: "22px", letterSpacing: "-0.005em" }],
-        h2:      ["20px", { lineHeight: "28px", letterSpacing: "-0.012em" }],
-        h1:      ["26px", { lineHeight: "32px", letterSpacing: "-0.018em" }],
-        figure:  ["28px", { lineHeight: "32px", letterSpacing: "-0.01em" }],
-        hero:    ["38px", { lineHeight: "44px", letterSpacing: "-0.02em" }],
+        // Tighter at the small end, more dramatic at the top so KPIs and
+        // page headlines have real presence on the page.
+        eyebrow: ["10.5px", { lineHeight: "14px", letterSpacing: "0.08em" }],
+        meta:    ["12px",   { lineHeight: "18px" }],
+        body:    ["13.5px", { lineHeight: "20px" }],
+        lead:    ["15px",   { lineHeight: "22px" }],
+        h3:      ["17px",   { lineHeight: "24px", letterSpacing: "-0.005em" }],
+        h2:      ["22px",   { lineHeight: "28px", letterSpacing: "-0.015em" }],
+        h1:      ["30px",   { lineHeight: "36px", letterSpacing: "-0.02em" }],
+        figure:  ["36px",   { lineHeight: "40px", letterSpacing: "-0.02em" }],
+        hero:    ["56px",   { lineHeight: "60px", letterSpacing: "-0.025em" }],
       },
       borderRadius: {
         none: "0",
-        sm: "2px",
-        DEFAULT: "4px",
-        md: "5px",
-        lg: "6px",
+        sm: "3px",
+        DEFAULT: "5px",
+        md: "6px",
+        lg: "8px",
       },
       boxShadow: {
-        rule: "0 1px 0 0 #EAE6DD",
-        // Used sparingly — hover/focus only. Default cards are flat with borders.
-        focus: "0 0 0 3px rgba(94, 106, 210, 0.18)",
+        rule: "0 1px 0 0 #E5E2DC",
+        focus: "0 0 0 3px rgba(30, 58, 138, 0.15)",
       },
     },
   },

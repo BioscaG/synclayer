@@ -29,7 +29,7 @@ export function DonutChart({
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={empty ? [{ name: "—", value: 1, color: "#E4E4E7" }] : data}
+            data={empty ? [{ name: "—", value: 1, color: "#E5E2DC" }] : data}
             dataKey="value"
             innerRadius="62%"
             outerRadius="92%"
@@ -37,21 +37,21 @@ export function DonutChart({
             stroke="none"
             isAnimationActive={false}
           >
-            {(empty ? [{ color: "#E4E4E7" }] : data).map((d, i) => (
+            {(empty ? [{ color: "#E5E2DC" }] : data).map((d, i) => (
               <Cell key={i} fill={d.color} />
             ))}
           </Pie>
           {!empty && (
             <Tooltip
               contentStyle={{
-                border: "1px solid #E4E4E7",
+                border: "1px solid #E5E2DC",
                 borderRadius: 4,
                 background: "#FFFFFF",
                 fontSize: 12,
                 fontFamily: "JetBrains Mono, monospace",
-                color: "#18181B",
+                color: "#0F1419",
               }}
-              itemStyle={{ color: "#18181B" }}
+              itemStyle={{ color: "#0F1419" }}
             />
           )}
         </PieChart>

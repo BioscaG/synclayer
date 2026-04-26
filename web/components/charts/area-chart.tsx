@@ -44,10 +44,10 @@ export function StackedAreaChart({
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E2DC" vertical={false} />
           <XAxis
             dataKey={xKey}
-            stroke="#71717A"
+            stroke="#8A8E94"
             tickLine={false}
             axisLine={false}
             tick={{ fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
@@ -63,7 +63,7 @@ export function StackedAreaChart({
             }}
           />
           <YAxis
-            stroke="#71717A"
+            stroke="#8A8E94"
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
@@ -71,17 +71,17 @@ export function StackedAreaChart({
             tick={{ fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}
           />
           <Tooltip
-            cursor={{ stroke: "#D4D4D8", strokeDasharray: "3 3" }}
+            cursor={{ stroke: "#D2CFC9", strokeDasharray: "3 3" }}
             contentStyle={{
-              border: "1px solid #E4E4E7",
+              border: "1px solid #E5E2DC",
               borderRadius: 4,
               background: "#FFFFFF",
               fontSize: 12,
               fontFamily: "JetBrains Mono, monospace",
-              color: "#18181B",
+              color: "#0F1419",
             }}
-            labelStyle={{ color: "#71717A", marginBottom: 4 }}
-            itemStyle={{ color: "#18181B" }}
+            labelStyle={{ color: "#8A8E94", marginBottom: 4 }}
+            itemStyle={{ color: "#0F1419" }}
           />
           {series.map((s) => (
             <Area
